@@ -6,6 +6,6 @@ router.get('/:pid',getPlacesById);
 
 router.get('/user/:uid', getPlaceByUserId);
 
-router.post('/newUser', postNewPlace);
+router.post('/', postNewPlace);
 
 module.exports = router;
