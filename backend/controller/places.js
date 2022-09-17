@@ -33,12 +33,13 @@ module.exports.getPlaceByUserId = (req,res,next)=>{
 }
 
 module.exports.postNewPlace = (req,res,next) =>{
-    const {id,title, coordinates,creator} = req.body;    
+    const {title, coordinates,creator} = req.body;    
     const createdPlace = {
-        id: id,
+        id: "u2",
         title : title,
         location : coordinates,
         creator : creator
     }
     DummyData.push(createdPlace);
+    res.status(201).json({"place" : createdPlace});
 }
