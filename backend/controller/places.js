@@ -1,6 +1,6 @@
 const HttpError = require('../models/httpError');
 
-const DummyData = [{
+let DummyData = [{
     id : 'p1',
     title : 'Empire State Building',
     location:{
@@ -10,6 +10,7 @@ const DummyData = [{
     creator : 'u1'
 }]
 
+let cnt = 2;
 
 module.exports.getPlacesById = (req,res,next)=>{
     const placeId = req.params.pid;
@@ -20,26 +21,49 @@ module.exports.getPlacesById = (req,res,next)=>{
     res.json({place});    
 }
 
-module.exports.getPlaceByUserId = (req,res,next)=>{
+module.exports.getPlacesByUserId = (req,res,next)=>{
     const userId = req.params.uid;
-    const place = DummyData.find(p =>{
+    const places = DummyData.filter(p =>{
         return p.creator === userId;
     })
 
-    if(!place){
+    if(!places || places.length === 0){
         new HttpError("we don't find matching place for this user",404);
     }
-    res.json({place});
+    res.json({places});
 }
 
 module.exports.postNewPlace = (req,res,next) =>{
     const {title, coordinates,creator} = req.body;    
     const createdPlace = {
-        id: "u2",
+        id: "p"&&cnt,
         title : title,
         location : coordinates,
         creator : creator
     }
     DummyData.push(createdPlace);
+    cnt++;
     res.status(201).json({"place" : createdPlace});
+}
+
+module.exports.patchPlacesById = (req,res,next) =>{
+    const placeId = req.params.pid;
+    const {title,creator} = req.body;
+    //copy entire found objects and update it in once
+    const updatedPlace = {...DummyData.find(p => p.id === placeId)};
+    const updatedPlaceIndex = DummyData.findIndex(p => p.id === placeId);
+    updatedPlace.title = title;
+    updatedPlace.creator = creator;
+
+    DummyData[updatedPlaceIndex] = updatedPlace;
+
+    res.status(200).json({"place" : updatedPlace});
+}
+
+module.exports.deletePlaceById = (req,res,next) =>{
+    const placeId = req.params.pid;
+    const deletedData = DummyData.find(p=>p.id === placeId);
+    DummyData = DummyData.filter(p => p.id!==placeId);
+
+    res.status(200).json({"deletedPlace" : deletedData});
 }
